@@ -64,7 +64,7 @@ class Usage
 
         // extract includes from files
         var includeFinder = new IncludeFinder();
-        var includes = await includeFinder.ReadIncludes(directory);
+        var includes = await includeFinder.ReadIncludes(directory).ToListAsync();
 
         // Merge with some markdown text
         var markdownProcessor = new MarkdownProcessor(

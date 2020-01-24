@@ -8,11 +8,11 @@ public class IncludeFinderTests :
     VerifyBase
 {
     [Fact]
-    public Task Simple()
+    public async Task Simple()
     {
         var finder = new IncludeFinder();
-        var includes = finder.ReadIncludes("IncludeFinder");
-        return Verify(includes);
+        var includes = await finder.ReadIncludes("IncludeFinder").ToListAsync();
+        await Verify(includes);
     }
 
     public IncludeFinderTests(ITestOutputHelper output) :

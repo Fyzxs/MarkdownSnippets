@@ -139,9 +139,13 @@ namespace MarkdownSnippets
         {
             directory = ExpandDirectory(directory);
             var finder = new IncludeFinder(directoryFilter);
-            var toAdd = (await finder.ReadIncludes(directory)).ToList();
-            includes.AddRange(toAdd);
-            log($"Added {toAdd.Count} .include files");
+
+            await foreach(var include in finder.ReadIncludes(directory))
+            {
+                includes.Add(include);
+            }
+
+            log($"Includes count: {includes.Count}");
         }
 
         public void AddMdFiles(params string[] files)
