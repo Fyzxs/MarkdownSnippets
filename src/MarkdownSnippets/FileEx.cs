@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 
 static class FileEx
 {
@@ -8,6 +10,7 @@ static class FileEx
     {
         return new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
     }
+
     public static string GetRelativePath(string file, string directory)
     {
         var fileUri = new Uri(file);
@@ -16,10 +19,11 @@ static class FileEx
         {
             directory += Path.DirectorySeparatorChar;
         }
+
         var directoryUri = new Uri(directory);
         return Uri.UnescapeDataString(directoryUri.MakeRelativeUri(fileUri).ToString().Replace('/', Path.DirectorySeparatorChar));
     }
-    
+
     public static IEnumerable<string> FindFiles(string directory, string pattern)
     {
         var files = new List<string>();
@@ -33,12 +37,14 @@ static class FileEx
 
         return files;
     }
+
     public static void ClearReadOnly(string path)
     {
         if (!File.Exists(path))
         {
             return;
         }
+
         new FileInfo(path)
         {
             IsReadOnly = false
@@ -51,5 +57,28 @@ static class FileEx
         {
             IsReadOnly = true
         };
+    }
+
+    public static async Task<List<string>> ReadAllLinesAsync(
+        string path,
+        CancellationToken cancellationToken = default)
+    {
+        using var reader = File.OpenText(path);
+        cancellationToken.ThrowIfCancellationRequested();
+        var lines = new List<string>();
+        while (true)
+        {
+            string line;
+            if ((line = await reader.ReadLineAsync()) != null)
+            {
+                lines.Add(line);
+                cancellationToken.ThrowIfCancellationRequested();
+            }
+            else
+            {
+                break;
+            }
+        }
+        return lines;
     }
 }
