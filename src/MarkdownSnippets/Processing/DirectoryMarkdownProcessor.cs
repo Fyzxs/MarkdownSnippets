@@ -175,10 +175,7 @@ namespace MarkdownSnippets
                 targetDirectory,
                 header,
                 tocExcludes);
-            foreach (var sourceFile in sourceMdFiles)
-            {
-                await ProcessFile(sourceFile, processor);
-            }
+            await Task.WhenAll(sourceMdFiles.Select(x => ProcessFile(x, processor)));
         }
 
         async Task ProcessFile(string sourceFile, MarkdownProcessor markdownProcessor)
