@@ -110,9 +110,11 @@ namespace MarkdownSnippets
             var files = finder.FindFiles(directory);
             snippetSourceFiles.AddRange(files);
             log($"Searching {files.Count} files for snippets");
-            var read = await FileSnippetExtractor.Read(files, maxWidth).ToListAsync();
-            snippets.AddRange(read);
-            log($"Added {read.Count} snippets");
+            await foreach(var snippet in FileSnippetExtractor.Read(files, maxWidth))
+            {
+                snippets.Add(snippet);
+            }
+            log($"Snippet count: {snippets.Count}");
         }
 
         string ExpandDirectory(string directory)
