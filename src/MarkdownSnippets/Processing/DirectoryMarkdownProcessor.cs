@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -20,14 +21,15 @@ namespace MarkdownSnippets
         Action<string> log;
         string targetDirectory;
         List<string> sourceMdFiles = new List<string>();
-        List<Include> includes = new List<Include>();
-        List<Snippet> snippets = new List<Snippet>();
-        public IReadOnlyList<Snippet> Snippets => snippets;
+        ConcurrentBag<Include> includes = new ConcurrentBag<Include>();
+        ConcurrentBag<Snippet> snippets = new ConcurrentBag<Snippet>();
+        public IReadOnlyCollection<Snippet> Snippets => snippets;
         List<string> snippetSourceFiles = new List<string>();
         AppendSnippetGroupToMarkdown appendSnippetGroup;
         bool treatMissingSnippetAsWarning;
         bool treatMissingIncludeAsWarning;
         Task? addSnippetsFromTask = null;
+         Task? addIncludesFromTask;
 
         public DirectoryMarkdownProcessor(
             string targetDirectory,
@@ -77,7 +79,7 @@ namespace MarkdownSnippets
 
             if (scanForIncludes)
             {
-                AddIncludeFilesFrom(targetDirectory);
+                addIncludesFromTask =AddIncludeFilesFrom(targetDirectory);
             }
         }
 
@@ -131,11 +133,11 @@ namespace MarkdownSnippets
             log($"Added {files.Count} .source.md files");
         }
 
-        public void AddIncludeFilesFrom(string directory)
+        public async Task AddIncludeFilesFrom(string directory)
         {
             directory = ExpandDirectory(directory);
             var finder = new IncludeFinder(directoryFilter);
-            var toAdd = finder.ReadIncludes(directory).ToList();
+            var toAdd = (await finder.ReadIncludes(directory)).ToList();
             includes.AddRange(toAdd);
             log($"Added {toAdd.Count} .include files");
         }
@@ -154,6 +156,11 @@ namespace MarkdownSnippets
             if (addSnippetsFromTask != null)
             {
                 await addSnippetsFromTask;
+            }
+
+            if (addIncludesFromTask != null)
+            {
+                await addIncludesFromTask;
             }
             Guard.AgainstNull(Snippets, nameof(snippets));
             Guard.AgainstNull(snippetSourceFiles, nameof(snippetSourceFiles));

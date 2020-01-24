@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +7,13 @@ using System.Threading;
 using System.Threading.Tasks;
 
 static class Extensions
-{
+{  public static void AddRange<T>(this ConcurrentBag<T> @this, IEnumerable<T> toAdd)
+    {
+        foreach (var element in toAdd)
+        {
+            @this.Add(element);
+        }
+    }
     public static async ValueTask<List<TSource>> ToListAsync<TSource>(
         this IAsyncEnumerable<TSource> source,
         CancellationToken cancellation = default)

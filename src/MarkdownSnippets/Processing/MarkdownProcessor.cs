@@ -23,7 +23,7 @@ namespace MarkdownSnippets
 
         public MarkdownProcessor(
             IReadOnlyDictionary<string, IReadOnlyList<Snippet>> snippets,
-            IReadOnlyList<Include> includes,
+            IReadOnlyCollection<Include> includes,
             AppendSnippetGroupToMarkdown appendSnippetGroup,
             IReadOnlyList<string> snippetSourceFiles,
             int tocLevel,

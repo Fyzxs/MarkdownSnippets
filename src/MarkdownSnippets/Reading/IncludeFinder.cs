@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace MarkdownSnippets
 {
@@ -14,7 +15,7 @@ namespace MarkdownSnippets
             fileFinder = new IncludeFileFinder(directoryFilter);
         }
 
-        public IReadOnlyList<Include> ReadIncludes(params string[] directories)
+        public async Task<IReadOnlyList<Include>> ReadIncludes(params string[] directories)
         {
             Guard.AgainstNull(directories, nameof(directories));
             var files = fileFinder.FindFiles(directories).ToList();
@@ -27,7 +28,7 @@ namespace MarkdownSnippets
                     throw new Exception($"Duplicate include: {key}");
                 }
 
-                dictionary[key] = Include.Build(key, File.ReadAllLines(file), file);
+                dictionary[key] = Include.Build(key, await FileEx.ReadAllLinesAsync(file), file);
             }
 
             return dictionary.Values.ToList();

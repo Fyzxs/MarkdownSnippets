@@ -7,10 +7,10 @@ using MarkdownSnippets;
 
 class IncludeProcessor
 {
-    IReadOnlyList<Include> includes;
+    IReadOnlyCollection<Include> includes;
     string rootDirectory;
 
-    public IncludeProcessor(IReadOnlyList<Include> includes, string rootDirectory)
+    public IncludeProcessor(IReadOnlyCollection<Include> includes, string rootDirectory)
     {
         rootDirectory = Path.GetFullPath(rootDirectory);
         this.rootDirectory = rootDirectory.Replace(@"\", "/");
