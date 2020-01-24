@@ -29,7 +29,7 @@ namespace MarkdownSnippets
         bool treatMissingSnippetAsWarning;
         bool treatMissingIncludeAsWarning;
         Task? addSnippetsFromTask = null;
-         Task? addIncludesFromTask;
+        Task? addIncludesFromTask;
 
         public DirectoryMarkdownProcessor(
             string targetDirectory,
@@ -79,7 +79,7 @@ namespace MarkdownSnippets
 
             if (scanForIncludes)
             {
-                addIncludesFromTask =AddIncludeFilesFrom(targetDirectory);
+                addIncludesFromTask = AddIncludeFilesFrom(targetDirectory);
             }
         }
 
@@ -110,7 +110,7 @@ namespace MarkdownSnippets
             var files = finder.FindFiles(directory);
             snippetSourceFiles.AddRange(files);
             log($"Searching {files.Count} files for snippets");
-            var read = await FileSnippetExtractor.Read(files,maxWidth).ToListAsync();
+            var read = await FileSnippetExtractor.Read(files, maxWidth).ToListAsync();
             snippets.AddRange(read);
             log($"Added {read.Count} snippets");
         }
@@ -162,6 +162,7 @@ namespace MarkdownSnippets
             {
                 await addIncludesFromTask;
             }
+
             Guard.AgainstNull(Snippets, nameof(snippets));
             Guard.AgainstNull(snippetSourceFiles, nameof(snippetSourceFiles));
             var processor = new MarkdownProcessor(
@@ -176,7 +177,7 @@ namespace MarkdownSnippets
                 tocExcludes);
             foreach (var sourceFile in sourceMdFiles)
             {
-             await   ProcessFile(sourceFile, processor);
+                await ProcessFile(sourceFile, processor);
             }
         }
 
@@ -227,7 +228,7 @@ namespace MarkdownSnippets
                 }
             }
 
-            WriteLines(target, lines);
+            await WriteLines(target, lines);
 
             if (readOnly)
             {
@@ -235,12 +236,12 @@ namespace MarkdownSnippets
             }
         }
 
-        static void WriteLines(string target, List<Line> lines)
+        static async Task WriteLines(string target, List<Line> lines)
         {
             using var writer = File.CreateText(target);
             foreach (var line in lines)
             {
-                writer.WriteLine(line.Current);
+                await writer.WriteLineAsync(line.Current);
             }
         }
 

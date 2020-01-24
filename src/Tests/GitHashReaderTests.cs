@@ -9,10 +9,10 @@ public class GitHashReaderTests :
     VerifyBase
 {
     [Fact]
-    public void GetHash()
+    public async Task GetHash()
     {
         var path = GitRepoDirectoryFinder.FindForFilePath();
-        var hash = GitHashReader.GetHash(path);
+        var hash = await GitHashReader.GetHash(path);
         Assert.NotNull(hash);
         Assert.NotEmpty(hash);
     }
@@ -29,11 +29,11 @@ public class GitHashReaderTests :
         return VerifyInner("GitDirs/WithRef");
     }
 
-    Task VerifyInner(string path)
+    async Task VerifyInner(string path)
     {
         var directory = Path.Combine(AssemblyLocation.CurrentDirectory, path);
-        var hash = GitHashReader.GetHashForGitDirectory(directory);
-        return Verify(hash);
+        var hash = await GitHashReader.GetHashForGitDirectory(directory);
+        await  Verify(hash);
     }
 
     public GitHashReaderTests(ITestOutputHelper output) :

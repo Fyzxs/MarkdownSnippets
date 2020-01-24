@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Threading.Tasks;
 
 class IndexReader
 {
@@ -65,14 +66,14 @@ class IndexReader
         }
     }
 
-    public string ReadLine()
+    public async Task<string> ReadLine()
     {
         Index++;
         if (Index == 1)
         {
             return ReadFirstLine();
         }
-        return textReader.ReadLine();
+        return await textReader.ReadLineAsync();
     }
 
     public bool IsEnd()
