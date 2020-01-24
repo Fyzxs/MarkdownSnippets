@@ -41,7 +41,8 @@ namespace MarkdownSnippets
                 throw new SnippetException($"Unable to get UrlAsSnippet: {url}");
             }
 
-            var snippet = Snippet.Build(1, content!.LineCount(), content!, key, GetLanguageFromPath(url), null);
+            var result = await content!;
+            var snippet = Snippet.Build(1, result.LineCount(), result, key, GetLanguageFromPath(url), null);
             snippets.Add(snippet);
         }
 

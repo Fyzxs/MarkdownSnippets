@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -9,6 +11,42 @@ static class FileEx
     public static FileStream OpenRead(string path)
     {
         return new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+    }
+
+    public static async Task<string> ReadAllTextAsync(
+        string path,
+        CancellationToken cancellation = default)
+    {
+        char[]? buffer = null;
+        var reader = File.OpenText(path);
+        try
+        {
+            cancellation.ThrowIfCancellationRequested();
+            buffer = ArrayPool<char>.Shared.Rent(reader.CurrentEncoding.GetMaxCharCount(4096));
+            var builder = new StringBuilder();
+            while (true)
+            {
+                var charCount = await reader.ReadAsync(buffer, 0, buffer.Length);
+                if (charCount != 0)
+                {
+                    builder.Append(buffer, 0, charCount);
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            return builder.ToString();
+        }
+        finally
+        {
+            reader.Dispose();
+            if (buffer != null)
+            {
+                ArrayPool<char>.Shared.Return(buffer);
+            }
+        }
     }
 
     public static string GetRelativePath(string file, string directory)

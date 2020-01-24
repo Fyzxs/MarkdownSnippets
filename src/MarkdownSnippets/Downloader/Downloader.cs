@@ -75,12 +75,12 @@ static class Downloader
         return (true, file);
     }
 
-    public static async Task<(bool success, string? content)> DownloadContent(string uri)
+    public static async Task<(bool success, Task<string>? content)> DownloadContent(string uri)
     {
         var (success, path) = await DownloadFile(uri);
         if (success)
         {
-            return (true, File.ReadAllText(path));
+            return (true, FileEx.ReadAllTextAsync(path!));
         }
         return (false, null);
     }

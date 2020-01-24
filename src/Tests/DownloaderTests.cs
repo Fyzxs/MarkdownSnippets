@@ -9,8 +9,9 @@ public class DownloaderTests :
     [Fact]
     public async Task Valid()
     {
-        var content = await Downloader.DownloadContent("https://raw.githubusercontent.com/SimonCropp/MarkdownSnippets/master/license.txt");
-        await Verify(new {content.success, content.content});
+        var result = await Downloader.DownloadContent("https://raw.githubusercontent.com/SimonCropp/MarkdownSnippets/master/license.txt");
+        var content = await result.content!;
+        await Verify(new {result.success, content});
     }
 
     [Fact]
