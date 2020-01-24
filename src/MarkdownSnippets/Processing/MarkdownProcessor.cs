@@ -92,7 +92,7 @@ namespace MarkdownSnippets
             Guard.AgainstNull(textReader, nameof(textReader));
             Guard.AgainstNull(writer, nameof(writer));
             Guard.AgainstEmpty(file, nameof(file));
-            var (lines, newLine) = LineReader.ReadAllLines(textReader, null);
+            var (lines, newLine) = await LineReader.ReadAllLines(textReader, null);
             writer.NewLine = newLine;
             var result = await Apply(lines, newLine, file);
             foreach (var line in lines)

@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 
 static class LineReader
 {
-    public static (List<Line> lines, string newLine) ReadAllLines(TextReader textReader, string? path)
+    public static async Task<(List<Line> lines, string newLine)> ReadAllLines(TextReader textReader, string? path)
     {
         var lines = new List<Line>();
 
@@ -15,7 +16,7 @@ static class LineReader
         do
         {
             index++;
-            var original = textReader.ReadLine();
+            var original = await textReader.ReadLineAsync();
 
             if (original == null)
             {

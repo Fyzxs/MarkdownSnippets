@@ -186,7 +186,7 @@ namespace MarkdownSnippets
             var target = GetTargetFile(sourceFile, targetDirectory);
             FileEx.ClearReadOnly(target);
 
-            var (lines, newLine) = ReadLines(sourceFile);
+            var (lines, newLine) = await ReadLines(sourceFile);
 
             var relativeSource = sourceFile
                 .Substring(targetDirectory.Length)
@@ -244,10 +244,10 @@ namespace MarkdownSnippets
             }
         }
 
-        static (List<Line> lines, string newLine) ReadLines(string sourceFile)
+        static async Task<(List<Line> lines, string newLine)> ReadLines(string sourceFile)
         {
             using var reader = File.OpenText(sourceFile);
-            return LineReader.ReadAllLines(reader, sourceFile);
+            return await LineReader.ReadAllLines(reader, sourceFile);
         }
 
         static string GetTargetFile(string sourceFile, string rootDirectory)
