@@ -16,29 +16,29 @@ class Usage
         #endregion
     }
 
-    void DirectoryMarkdownProcessorRun()
+    async Task DirectoryMarkdownProcessorRun()
     {
         #region DirectoryMarkdownProcessorRun
 
         var processor = new DirectoryMarkdownProcessor("targetDirectory");
-        processor.Run();
+        await processor.Run();
 
         #endregion
     }
 
-    void DirectoryMarkdownProcessorRunMaxWidth()
+    async Task DirectoryMarkdownProcessorRunMaxWidth()
     {
         #region DirectoryMarkdownProcessorRunMaxWidth
 
         var processor = new DirectoryMarkdownProcessor(
             "targetDirectory",
             maxWidth: 80);
-        processor.Run();
+        await processor.Run();
 
         #endregion
     }
 
-    void ReadingDirectory()
+    async Task ReadingDirectory()
     {
         #region ReadingDirectorySimple
 
@@ -47,7 +47,7 @@ class Usage
             // all directories except bin and obj
             directoryFilter: dirPath => !dirPath.EndsWith("bin") &&
                                         !dirPath.EndsWith("obj"));
-        var snippets = snippetExtractor.ReadSnippets(@"C:\path");
+        var snippets = await snippetExtractor.ReadSnippets(@"C:\path");
 
         #endregion
     }
@@ -60,7 +60,7 @@ class Usage
 
         // extract snippets from files
         var snippetExtractor = new DirectorySnippetExtractor();
-        var snippets = snippetExtractor.ReadSnippets(directory);
+        var snippets = await snippetExtractor.ReadSnippets(directory);
 
         // extract includes from files
         var includeFinder = new IncludeFinder();

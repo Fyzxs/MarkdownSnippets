@@ -12,14 +12,14 @@ public class DirectorySnippetExtractorTests :
     VerifyBase
 {
     [Fact]
-    public Task Case()
+    public async Task Case()
     {
         var directory = Path.Combine(AssemblyLocation.CurrentDirectory, "DirectorySnippetExtractor/Case");
         var extractor = new DirectorySnippetExtractor();
-        var snippets = extractor.ReadSnippets(directory);
+        var snippets = await extractor.ReadSnippets(directory);
         AssertCaseInsensitive(snippets.Lookup);
 
-        return Verify(snippets);
+        await Verify(snippets);
     }
 
     static void AssertCaseInsensitive(IReadOnlyDictionary<string, IReadOnlyList<Snippet>> dictionary)
@@ -29,25 +29,25 @@ public class DirectorySnippetExtractorTests :
     }
 
     [Fact]
-    public Task Nested()
+    public async Task Nested()
     {
         var directory = Path.Combine(AssemblyLocation.CurrentDirectory, "DirectorySnippetExtractor/Nested");
         var extractor = new DirectorySnippetExtractor();
-        var snippets = extractor.ReadSnippets(directory);
-        return Verify(snippets);
+        var snippets = await extractor.ReadSnippets(directory);
+        await Verify(snippets);
     }
 
     [Fact]
-    public Task Simple()
+    public async Task Simple()
     {
         var directory = Path.Combine(AssemblyLocation.CurrentDirectory, "DirectorySnippetExtractor/Simple");
         var extractor = new DirectorySnippetExtractor();
-        var snippets = extractor.ReadSnippets(directory);
-        return Verify(snippets);
+        var snippets = await extractor.ReadSnippets(directory);
+        await Verify(snippets);
     }
 
     [Fact]
-    public Task VerifyLambdasAreCalled()
+    public async Task VerifyLambdasAreCalled()
     {
         var directories = new ConcurrentBag<string>();
         var targetDirectory = Path.Combine(AssemblyLocation.CurrentDirectory,
@@ -59,8 +59,8 @@ public class DirectorySnippetExtractorTests :
                 return true;
             }
         );
-        extractor.ReadSnippets(targetDirectory);
-        return Verify(directories.OrderBy(file => file));
+        await extractor.ReadSnippets(targetDirectory);
+        await Verify(directories.OrderBy(file => file));
     }
 
     public DirectorySnippetExtractorTests(ITestOutputHelper output) :

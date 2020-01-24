@@ -36,7 +36,7 @@ var snippetExtractor = new DirectorySnippetExtractor(
     // all directories except bin and obj
     directoryFilter: dirPath => !dirPath.EndsWith("bin") &&
                                 !dirPath.EndsWith("obj"));
-var snippets = snippetExtractor.ReadSnippets(@"C:\path");
+var snippets = await snippetExtractor.ReadSnippets(@"C:\path");
 ```
 <sup><a href='/src/Tests/Snippets/Usage.cs#L43-L52' title='File snippet `readingdirectorysimple` was extracted from'>snippet source</a> | <a href='#snippet-readingdirectorysimple' title='Navigate to start of snippet `readingdirectorysimple`'>anchor</a></sup>
 <!-- endsnippet -->
@@ -51,7 +51,7 @@ var directory = @"C:\path";
 
 // extract snippets from files
 var snippetExtractor = new DirectorySnippetExtractor();
-var snippets = snippetExtractor.ReadSnippets(directory);
+var snippets = await snippetExtractor.ReadSnippets(directory);
 
 // extract includes from files
 var includeFinder = new IncludeFinder();

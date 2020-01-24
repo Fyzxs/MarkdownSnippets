@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace MarkdownSnippets
 {
@@ -18,20 +19,25 @@ namespace MarkdownSnippets
             fileFinder = new SnippetFileFinder(directoryFilter);
         }
 
-        public ReadSnippets ReadSnippets(params string[] directories)
+        public async Task<ReadSnippets> ReadSnippets(params string[] directories)
         {
             Guard.AgainstNull(directories, nameof(directories));
             var files = fileFinder.FindFiles(directories).ToList();
-            var snippets = files
-                .SelectMany(file => Read(file, maxWidth))
-                .ToList();
+            var snippets = new List<Snippet>();
+            foreach (var file in files)
+            {
+                foreach (var snippet in await Read(file, maxWidth))
+                {
+                    snippets.Add(snippet);
+                }
+            }
             return new ReadSnippets(snippets, files);
         }
 
-        static IEnumerable<Snippet> Read(string file, int maxWidth)
+        static async ValueTask<List<Snippet>> Read(string file, int maxWidth)
         {
             using var reader = File.OpenText(file);
-            return FileSnippetExtractor.Read(reader, file, maxWidth).ToList();
+            return await FileSnippetExtractor.Read(reader, file, maxWidth).ToListAsync();
         }
     }
 }

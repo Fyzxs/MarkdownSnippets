@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using MarkdownSnippets;
 using Verify;
@@ -46,7 +45,7 @@ public class SnippetExtractorTests :
     }
 
     [Fact]
-    public Task CanExtractWithInnerWhiteSpace()
+    public async Task CanExtractWithInnerWhiteSpace()
     {
         var input = @"
   #region CodeKey
@@ -56,12 +55,12 @@ public class SnippetExtractorTests :
   AfterWhiteSpace
 
   #endregion";
-        var snippets = FromText(input);
-        return Verify(snippets);
+        var snippets =await  FromText(input);
+        await  Verify(snippets);
     }
 
     [Fact]
-    public Task NestedBroken()
+    public async Task NestedBroken()
     {
         var input = @"
   #region KeyParent
@@ -70,12 +69,12 @@ public class SnippetExtractorTests :
   b
   c
   #endregion";
-        var snippets = FromText(input);
-        return Verify(snippets);
+        var snippets = await FromText(input);
+        await  Verify(snippets);
     }
 
     [Fact]
-    public Task NestedRegion()
+    public async Task NestedRegion()
     {
         var input = @"
   #region KeyParent
@@ -85,12 +84,12 @@ public class SnippetExtractorTests :
   #endregion
   c
   #endregion";
-        var snippets = FromText(input);
-        return Verify(snippets);
+        var snippets = await FromText(input);
+        await  Verify(snippets);
     }
 
     [Fact]
-    public Task NestedMixed2()
+    public async Task NestedMixed2()
     {
         var input = @"
   #region KeyParent
@@ -100,12 +99,12 @@ public class SnippetExtractorTests :
   <!-- end-snippet -->
   c
   #endregion";
-        var snippets = FromText(input);
-        return Verify(snippets);
+        var snippets =await  FromText(input);
+        await  Verify(snippets);
     }
 
     [Fact]
-    public Task RemoveDuplicateNewlines()
+    public async Task RemoveDuplicateNewlines()
     {
         var input = @"
 
@@ -132,12 +131,12 @@ public class SnippetExtractorTests :
 
 
 ";
-        var snippets = FromText(input);
-        return Verify(snippets);
+        var snippets = await FromText(input);
+        await  Verify(snippets);
     }
 
     [Fact]
-    public Task NestedStartCode()
+    public async Task NestedStartCode()
     {
         var input = @"
   <!-- begin-snippet: KeyParent -->
@@ -147,12 +146,12 @@ public class SnippetExtractorTests :
   <!-- end-snippet -->
   c
   <!-- end-snippet -->";
-        var snippets = FromText(input);
-        return Verify(snippets);
+        var snippets = await FromText(input);
+        await  Verify(snippets);
     }
 
     [Fact]
-    public Task NestedMixed1()
+    public async Task NestedMixed1()
     {
         var input = @"
   <!-- begin-snippet: KeyParent -->
@@ -162,100 +161,100 @@ public class SnippetExtractorTests :
   #endregion
   c
   <!-- end-snippet -->";
-        var snippets = FromText(input);
-        return Verify(snippets);
+        var snippets =await  FromText(input);
+        await  Verify(snippets);
     }
 
     [Fact]
-    public Task CanExtractFromXml()
+    public async Task CanExtractFromXml()
     {
         var input = @"
   <!-- begin-snippet: CodeKey -->
   <configSections/>
   <!-- end-snippet -->";
-        var snippets = FromText(input);
-        return Verify(snippets);
+        var snippets = await FromText(input);
+        await  Verify(snippets);
     }
 
-    List<Snippet> FromText(string contents)
+    ValueTask<List<Snippet>> FromText(string contents)
     {
         using var stringReader = new StringReader(contents);
-        return FileSnippetExtractor.Read(stringReader, "path.cs", 80).ToList();
+        return FileSnippetExtractor.Read(stringReader, "path.cs", 80).ToListAsync();
     }
 
     [Fact]
-    public Task UnClosedSnippet()
+    public async Task UnClosedSnippet()
     {
         var input = @"
   <!-- begin-snippet: CodeKey -->
   <configSections/>";
-        var snippets = FromText(input);
-        return Verify(snippets);
+        var snippets = await FromText(input);
+        await  Verify(snippets);
     }
 
     [Fact]
-    public Task UnClosedRegion()
+    public async Task UnClosedRegion()
     {
         var input = @"
   #region CodeKey
   <configSections/>";
-        var snippets = FromText(input);
-        return Verify(snippets);
+        var snippets = await FromText(input);
+        await  Verify(snippets);
     }
 
     [Fact]
-    public Task TooWide()
+    public async Task TooWide()
     {
         var input = @"
   #region CodeKey
   caaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab
   #endregion";
-        var snippets = FromText(input);
-        return Verify(snippets);
+        var snippets = await FromText(input);
+        await  Verify(snippets);
     }
 
     [Fact]
-    public Task CanExtractFromRegion()
+    public async Task CanExtractFromRegion()
     {
         var input = @"
   #region CodeKey
   The Code
   #endregion";
-        var snippets = FromText(input);
-        return Verify(snippets);
+        var snippets = await FromText(input);
+        await  Verify(snippets);
     }
 
     [Fact]
-    public Task CanExtractWithNoTrailingCharacters()
+    public async Task CanExtractWithNoTrailingCharacters()
     {
         var input = @"
   // begin-snippet: CodeKey
   the code
   // end-snippet ";
-        var snippets = FromText(input);
-        return Verify(snippets);
+        var snippets = await FromText(input);
+        await  Verify(snippets);
     }
 
     [Fact]
-    public Task CanExtractWithMissingSpaces()
+    public async Task CanExtractWithMissingSpaces()
     {
         var input = @"
   <!--begin-snippet: CodeKey-->
   <configSections/>
   <!--end-snippet-->";
-        var snippets = FromText(input);
-        return Verify(snippets);
+        var snippets = await FromText(input);
+        await  Verify(snippets);
     }
 
     [Fact]
-    public Task CanExtractWithTrailingWhitespace()
+    public async Task CanExtractWithTrailingWhitespace()
     {
         var input = @"
   // begin-snippet: CodeKey
   the code
   // end-snippet   ";
-        var snippets = FromText(input);
-        return Verify(snippets);
+        var snippets = await FromText(input);
+        await  Verify(snippets);
     }
 
     public SnippetExtractorTests(ITestOutputHelper output) :

@@ -27,6 +27,7 @@ namespace MarkdownSnippets
         AppendSnippetGroupToMarkdown appendSnippetGroup;
         bool treatMissingSnippetAsWarning;
         bool treatMissingIncludeAsWarning;
+        Task? addSnippetsFromTask = null;
 
         public DirectoryMarkdownProcessor(
             string targetDirectory,
@@ -71,7 +72,7 @@ namespace MarkdownSnippets
 
             if (scanForSnippets)
             {
-                AddSnippetsFrom(targetDirectory);
+                addSnippetsFromTask = AddSnippetsFrom(targetDirectory);
             }
 
             if (scanForIncludes)
@@ -100,14 +101,14 @@ namespace MarkdownSnippets
             AddSnippets(snippets.ToList());
         }
 
-        public void AddSnippetsFrom(string directory)
+        public async Task AddSnippetsFrom(string directory)
         {
             directory = ExpandDirectory(directory);
             var finder = new SnippetFileFinder(directoryFilter);
             var files = finder.FindFiles(directory);
             snippetSourceFiles.AddRange(files);
             log($"Searching {files.Count} files for snippets");
-            var read = FileSnippetExtractor.Read(files,maxWidth).ToList();
+            var read = await FileSnippetExtractor.Read(files,maxWidth).ToListAsync();
             snippets.AddRange(read);
             log($"Added {read.Count} snippets");
         }
@@ -150,6 +151,10 @@ namespace MarkdownSnippets
 
         public async Task Run()
         {
+            if (addSnippetsFromTask != null)
+            {
+                await addSnippetsFromTask;
+            }
             Guard.AgainstNull(Snippets, nameof(snippets));
             Guard.AgainstNull(snippetSourceFiles, nameof(snippetSourceFiles));
             var processor = new MarkdownProcessor(

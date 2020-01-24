@@ -2,9 +2,32 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 static class Extensions
 {
+    public static async ValueTask<List<TSource>> ToListAsync<TSource>(
+        this IAsyncEnumerable<TSource> source,
+        CancellationToken cancellation = default)
+    {
+        var asyncEnumerator = source.GetAsyncEnumerator(cancellation);
+        var list = new List<TSource>();
+        try
+        {
+            while (await asyncEnumerator.MoveNextAsync())
+            {
+                list.Add(asyncEnumerator.Current);
+            }
+        }
+        finally
+        {
+            await asyncEnumerator.DisposeAsync();
+        }
+
+        return list;
+    }
+
     public static void TrimEnd(this StringBuilder builder)
     {
         var i = builder.Length - 1;
