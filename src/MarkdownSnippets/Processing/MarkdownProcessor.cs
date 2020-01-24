@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace MarkdownSnippets
 {
@@ -59,7 +60,7 @@ namespace MarkdownSnippets
             includeProcessor = new IncludeProcessor(includes, rootDirectory);
         }
 
-        public string Apply(string input, string? file = null)
+        public async Task<string> Apply(string input, string? file = null)
         {
             Guard.AgainstNull(input, nameof(input));
             Guard.AgainstEmpty(file, nameof(file));
@@ -68,7 +69,7 @@ namespace MarkdownSnippets
             {
                 using var reader = new StringReader(input);
                 using var writer = new StringWriter(builder);
-                var processResult = Apply(reader, writer, file);
+                var processResult = await Apply(reader, writer, file);
                 var missing = processResult.MissingSnippets;
                 if (missing.Any())
                 {
@@ -86,7 +87,7 @@ namespace MarkdownSnippets
         /// <summary>
         /// Apply to <paramref name="writer"/>.
         /// </summary>
-        public ProcessResult Apply(TextReader textReader, TextWriter writer, string? file = null)
+        public Task<ProcessResult> Apply(TextReader textReader, TextWriter writer, string? file = null)
         {
             Guard.AgainstNull(textReader, nameof(textReader));
             Guard.AgainstNull(writer, nameof(writer));
@@ -102,7 +103,7 @@ namespace MarkdownSnippets
             return result;
         }
 
-        internal ProcessResult Apply(List<Line> lines, string newLine, string? relativePath)
+        internal async Task<ProcessResult> Apply(List<Line> lines, string newLine, string? relativePath)
         {
             var missingSnippets = new List<MissingSnippet>();
             var missingIncludes = new List<MissingInclude>();
@@ -115,7 +116,7 @@ namespace MarkdownSnippets
             {
                 var line = lines[index];
 
-                if (includeProcessor.TryProcessInclude(lines, line, usedIncludes, index, missingIncludes))
+                if (await includeProcessor.TryProcessInclude(lines, line, usedIncludes, index, missingIncludes))
                 {
                     continue;
                 }

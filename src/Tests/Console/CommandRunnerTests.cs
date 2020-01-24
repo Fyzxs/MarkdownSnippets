@@ -166,10 +166,11 @@ public class CommandRunnerTests :
         return VerifyResult();
     }
 
-    void Capture(string targetDirectory, ConfigInput configInput)
+    Task Capture(string targetDirectory, ConfigInput configInput)
     {
         this.targetDirectory = targetDirectory;
         this.configInput = configInput;
+        return Task.CompletedTask;
     }
 
     Task VerifyResult()

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using MarkdownSnippets;
 
 class Program
@@ -17,7 +18,7 @@ class Program
         }
     }
 
-    static void Inner(string targetDirectory, ConfigInput configInput)
+    static async Task Inner(string targetDirectory, ConfigInput configInput)
     {
         var (fileConfig, configFilePath) = ConfigReader.Read(targetDirectory);
         var configResult = ConfigDefaults.Convert(fileConfig, configInput);
@@ -46,7 +47,7 @@ class Program
 
         try
         {
-            processor.Run();
+            await processor.Run();
         }
         catch (SnippetException exception)
         {

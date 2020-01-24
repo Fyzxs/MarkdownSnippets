@@ -11,7 +11,7 @@ public class DirectoryMarkdownProcessorTests :
     VerifyBase
 {
     [Fact]
-    public void Run()
+    public Task Run()
     {
         var root = GitRepoDirectoryFinder.FindForFilePath();
 
@@ -27,11 +27,11 @@ public class DirectoryMarkdownProcessorTests :
             directoryFilter: path =>
                 !path.Contains("IncludeFileFinder") &&
                 !path.Contains("DirectoryMarkdownProcessor"));
-        processor.Run();
+        return processor.Run();
     }
 
     [Fact]
-    public void ReadOnly()
+    public async Task ReadOnly()
     {
         var root = Path.GetFullPath("DirectoryMarkdownProcessor/Readonly");
         try
@@ -44,7 +44,7 @@ public class DirectoryMarkdownProcessorTests :
                 SnippetBuild("snippet1"),
                 SnippetBuild("snippet2")
             );
-            processor.Run();
+            await processor.Run();
 
             var fileInfo = new FileInfo(Path.Combine(root, "one.md"));
             Assert.True(fileInfo.IsReadOnly);
@@ -59,12 +59,12 @@ public class DirectoryMarkdownProcessorTests :
     }
 
     [Fact]
-    public Task UrlSnippetMissing()
+    public async Task UrlSnippetMissing()
     {
         var root = Path.GetFullPath("DirectoryMarkdownProcessor/UrlSnippetMissing");
         var processor = new DirectoryMarkdownProcessor(root, writeHeader: false);
-        var exception = Assert.Throws<MissingSnippetsException>(() => processor.Run());
-        return Verify(
+        var exception = await Assert.ThrowsAsync<MissingSnippetsException>(() => processor.Run());
+        await Verify(
             new
             {
                 exception.Missing,
@@ -73,12 +73,12 @@ public class DirectoryMarkdownProcessorTests :
     }
 
     [Fact]
-    public Task UrlIncludeMissing()
+    public async Task UrlIncludeMissing()
     {
         var root = Path.GetFullPath("DirectoryMarkdownProcessor/UrlIncludeMissing");
         var processor = new DirectoryMarkdownProcessor(root, writeHeader: false);
-        var exception = Assert.Throws<MissingIncludesException>(() => processor.Run());
-        return Verify(
+        var exception = await Assert.ThrowsAsync<MissingIncludesException>(() => processor.Run());
+        await Verify(
             new
             {
                 exception.Missing,
@@ -87,31 +87,31 @@ public class DirectoryMarkdownProcessorTests :
     }
 
     [Fact]
-    public Task UrlSnippet()
+    public async Task UrlSnippet()
     {
         var root = Path.GetFullPath("DirectoryMarkdownProcessor/UrlSnippet");
         var processor = new DirectoryMarkdownProcessor(root, writeHeader: false);
-        processor.Run();
+        await processor.Run();
 
         var result = Path.Combine(root,"one.md");
 
-        return Verify(File.ReadAllText(result));
+        await Verify(await File.ReadAllTextAsync(result));
     }
 
     [Fact]
-    public Task UrlInclude()
+    public async Task UrlInclude()
     {
         var root = Path.GetFullPath("DirectoryMarkdownProcessor/UrlInclude");
         var processor = new DirectoryMarkdownProcessor(root, writeHeader: false);
-        processor.Run();
+        await processor.Run();
 
         var result = Path.Combine(root,"one.md");
 
-        return Verify(File.ReadAllText(result));
+        await Verify(await File.ReadAllTextAsync(result));
     }
 
     [Fact]
-    public Task Convention()
+    public async Task Convention()
     {
         var root = Path.GetFullPath("DirectoryMarkdownProcessor/Convention");
         var processor = new DirectoryMarkdownProcessor(root, writeHeader: false);
@@ -119,7 +119,7 @@ public class DirectoryMarkdownProcessorTests :
             SnippetBuild("snippet1"),
             SnippetBuild("snippet2")
         );
-        processor.Run();
+       await processor.Run();
 
         var builder = new StringBuilder();
         foreach (var file in Directory.EnumerateFiles(root, "*.*", SearchOption.AllDirectories))
@@ -129,45 +129,45 @@ public class DirectoryMarkdownProcessorTests :
             builder.AppendLine();
         }
 
-        return Verify(builder.ToString());
+        await Verify(builder.ToString());
     }
 
     [Fact]
-    public void MustErrorByDefaultWhenIncludesAreMissing()
+    public Task MustErrorByDefaultWhenIncludesAreMissing()
     {
         var root = Path.GetFullPath("DirectoryMarkdownProcessor/MissingInclude");
         var processor = new DirectoryMarkdownProcessor(root, writeHeader: false);
-        Assert.Throws<MissingIncludesException>(() => processor.Run());
+        return Assert.ThrowsAsync<MissingIncludesException>(() => processor.Run());
     }
 
     [Fact]
-    public void MustNotErrorForMissingIncludesIfConfigured()
+    public Task MustNotErrorForMissingIncludesIfConfigured()
     {
         var root = Path.GetFullPath("DirectoryMarkdownProcessor/MissingInclude");
         var processor = new DirectoryMarkdownProcessor(
             root,
             writeHeader: false,
             treatMissingIncludeAsWarning: true);
-        processor.Run();
+        return processor.Run();
     }
 
     [Fact]
-    public void MustErrorByDefaultWhenSnippetsAreMissing()
+    public Task MustErrorByDefaultWhenSnippetsAreMissing()
     {
         var root = Path.GetFullPath("DirectoryMarkdownProcessor/Convention");
         var processor = new DirectoryMarkdownProcessor(root, writeHeader: false);
-        Assert.Throws<MissingSnippetsException>(() => processor.Run());
+        return Assert.ThrowsAsync<MissingSnippetsException>(() => processor.Run());
     }
 
     [Fact]
-    public void MustNotErrorForMissingSnippetsIfConfigured()
+    public Task MustNotErrorForMissingSnippetsIfConfigured()
     {
         var root = Path.GetFullPath("DirectoryMarkdownProcessor/Convention");
         var processor = new DirectoryMarkdownProcessor(
             root,
             writeHeader: false,
             treatMissingSnippetAsWarning: true);
-        processor.Run();
+        return processor.Run();
     }
 
     static Snippet SnippetBuild(string key)

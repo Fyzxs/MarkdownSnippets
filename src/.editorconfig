@@ -64,6 +64,10 @@ csharp_new_line_before_members_in_anonymous_types = true:error
 #csharp_prefer_braces = true:error
 
 # msbuild
+
+# CS4014: Because this call is not awaited, execution of the current method continues before the call is completed
+dotnet_diagnostic.CS4014.severity = error
+
 [*.{csproj,targets,props}]
 indent_size = 2
 

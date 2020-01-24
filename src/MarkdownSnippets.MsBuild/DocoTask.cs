@@ -1,8 +1,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.Build.Framework;
-using Microsoft.Build.Utilities;
+using Task = Microsoft.Build.Utilities.Task;
 
 namespace MarkdownSnippets
 {
@@ -25,6 +26,11 @@ namespace MarkdownSnippets
         public bool? TreatMissingIncludeAsWarning { get; set; }
 
         public override bool Execute()
+        {
+            return Inner().GetAwaiter().GetResult();
+        }
+
+        private async Task<bool> Inner()
         {
             var stopwatch = Stopwatch.StartNew();
             var root = GitRepoDirectoryFinder.FindForDirectory(ProjectDirectory);
@@ -70,7 +76,7 @@ namespace MarkdownSnippets
 
             try
             {
-                snippets.AppendUrlsAsSnippets(configResult.UrlsAsSnippets).GetAwaiter().GetResult();
+                await snippets.AppendUrlsAsSnippets(configResult.UrlsAsSnippets);
                 processor.AddSnippets(snippets);
                 var snippetsInError = processor.Snippets.Where(x => x.IsInError).ToList();
                 if (snippetsInError.Any())
@@ -83,7 +89,7 @@ namespace MarkdownSnippets
                     return false;
                 }
 
-                processor.Run();
+                await processor.Run();
                 return true;
             }
             catch (MissingSnippetsException exception)

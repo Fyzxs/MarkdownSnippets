@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using MarkdownSnippets;
 
 class IncludeProcessor
@@ -16,19 +17,19 @@ class IncludeProcessor
         this.includes = includes;
     }
 
-    public bool TryProcessInclude(List<Line> lines, Line line, List<Include> usedIncludes, int index, List<MissingInclude> missingIncludes)
+    public async Task<bool> TryProcessInclude(List<Line> lines, Line line, List<Include> usedIncludes, int index, List<MissingInclude> missingIncludes)
     {
         if (!line.Current.StartsWith("include: "))
         {
             return false;
         }
 
-        Inner(lines, line, usedIncludes, index, missingIncludes);
+        await Inner(lines, line, usedIncludes, index, missingIncludes);
 
         return true;
     }
 
-    void Inner(List<Line> lines, Line line, List<Include> usedIncludes, int index, List<MissingInclude> missingIncludes)
+    async Task Inner(List<Line> lines, Line line, List<Include> usedIncludes, int index, List<MissingInclude> missingIncludes)
     {
         var includeKey = line.Current.Substring(9);
         var include = includes.SingleOrDefault(x => string.Equals(x.Key, includeKey, StringComparison.OrdinalIgnoreCase));
@@ -40,7 +41,7 @@ class IncludeProcessor
 
         if (includeKey.StartsWith("http"))
         {
-            var (success, path) = Downloader.DownloadFile(includeKey).GetAwaiter().GetResult();
+            var (success, path) = await Downloader.DownloadFile(includeKey);
             if (success)
             {
                 include = Include.Build(includeKey, File.ReadAllLines(path), null);
@@ -51,7 +52,6 @@ class IncludeProcessor
 
         missingIncludes.Add(new MissingInclude(includeKey, index + 1, line.Path));
         line.Current = $"** Could not find include '{includeKey}.include.md' **";
-        return;
     }
 
     void AddInclude(List<Line> lines, Line line, List<Include> usedIncludes, int index, Include include)

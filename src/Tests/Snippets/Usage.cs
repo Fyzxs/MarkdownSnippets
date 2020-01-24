@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using MarkdownSnippets;
 
 class Usage
@@ -51,7 +52,7 @@ class Usage
         #endregion
     }
 
-    void Basic()
+    async Task Basic()
     {
         #region markdownProcessingSimple
 
@@ -77,8 +78,8 @@ class Usage
 
         var path = @"C:\path\inputMarkdownFile.md";
         using var reader = File.OpenText(path);
-        using var writer = File.CreateText(@"C:\path\outputMarkdownFile.md");
-        var result = markdownProcessor.Apply(reader, writer, path);
+        await using var writer = File.CreateText(@"C:\path\outputMarkdownFile.md");
+        var result = await markdownProcessor.Apply(reader, writer, path);
         // snippets that the markdown file expected but did not exist in the input snippets
         var missingSnippets = result.MissingSnippets;
 

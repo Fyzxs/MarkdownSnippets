@@ -22,7 +22,7 @@ var files = Directory.EnumerateFiles(@"C:\path", "*.cs", SearchOption.AllDirecto
 
 var snippets = FileSnippetExtractor.Read(files);
 ```
-<sup><a href='/src/Tests/Snippets/Usage.cs#L9-L15' title='File snippet `readingfilessimple` was extracted from'>snippet source</a> | <a href='#snippet-readingfilessimple' title='Navigate to start of snippet `readingfilessimple`'>anchor</a></sup>
+<sup><a href='/src/Tests/Snippets/Usage.cs#L10-L16' title='File snippet `readingfilessimple` was extracted from'>snippet source</a> | <a href='#snippet-readingfilessimple' title='Navigate to start of snippet `readingfilessimple`'>anchor</a></sup>
 <!-- endsnippet -->
 
 
@@ -38,7 +38,7 @@ var snippetExtractor = new DirectorySnippetExtractor(
                                 !dirPath.EndsWith("obj"));
 var snippets = snippetExtractor.ReadSnippets(@"C:\path");
 ```
-<sup><a href='/src/Tests/Snippets/Usage.cs#L42-L51' title='File snippet `readingdirectorysimple` was extracted from'>snippet source</a> | <a href='#snippet-readingdirectorysimple' title='Navigate to start of snippet `readingdirectorysimple`'>anchor</a></sup>
+<sup><a href='/src/Tests/Snippets/Usage.cs#L43-L52' title='File snippet `readingdirectorysimple` was extracted from'>snippet source</a> | <a href='#snippet-readingdirectorysimple' title='Navigate to start of snippet `readingdirectorysimple`'>anchor</a></sup>
 <!-- endsnippet -->
 
 
@@ -69,15 +69,15 @@ var markdownProcessor = new MarkdownProcessor(
 
 var path = @"C:\path\inputMarkdownFile.md";
 using var reader = File.OpenText(path);
-using var writer = File.CreateText(@"C:\path\outputMarkdownFile.md");
-var result = markdownProcessor.Apply(reader, writer, path);
+await using var writer = File.CreateText(@"C:\path\outputMarkdownFile.md");
+var result = await markdownProcessor.Apply(reader, writer, path);
 // snippets that the markdown file expected but did not exist in the input snippets
 var missingSnippets = result.MissingSnippets;
 
 // snippets that the markdown file used
 var usedSnippets = result.UsedSnippets;
 ```
-<sup><a href='/src/Tests/Snippets/Usage.cs#L56-L88' title='File snippet `markdownprocessingsimple` was extracted from'>snippet source</a> | <a href='#snippet-markdownprocessingsimple' title='Navigate to start of snippet `markdownprocessingsimple`'>anchor</a></sup>
+<sup><a href='/src/Tests/Snippets/Usage.cs#L57-L89' title='File snippet `markdownprocessingsimple` was extracted from'>snippet source</a> | <a href='#snippet-markdownprocessingsimple' title='Navigate to start of snippet `markdownprocessingsimple`'>anchor</a></sup>
 <!-- endsnippet -->
 
 

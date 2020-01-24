@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace MarkdownSnippets
 {
@@ -147,7 +148,7 @@ namespace MarkdownSnippets
             }
         }
 
-        public void Run()
+        public async Task Run()
         {
             Guard.AgainstNull(Snippets, nameof(snippets));
             Guard.AgainstNull(snippetSourceFiles, nameof(snippetSourceFiles));
@@ -163,11 +164,11 @@ namespace MarkdownSnippets
                 tocExcludes);
             foreach (var sourceFile in sourceMdFiles)
             {
-                ProcessFile(sourceFile, processor);
+             await   ProcessFile(sourceFile, processor);
             }
         }
 
-        void ProcessFile(string sourceFile, MarkdownProcessor markdownProcessor)
+        async Task ProcessFile(string sourceFile, MarkdownProcessor markdownProcessor)
         {
             log($"Processing {sourceFile}");
             var target = GetTargetFile(sourceFile, targetDirectory);
@@ -178,7 +179,7 @@ namespace MarkdownSnippets
             var relativeSource = sourceFile
                 .Substring(targetDirectory.Length)
                 .Replace('\\', '/');
-            var result = markdownProcessor.Apply(lines, newLine, relativeSource);
+            var result = await markdownProcessor.Apply(lines, newLine, relativeSource);
 
             var missingSnippets = result.MissingSnippets;
             if (missingSnippets.Any())
