@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace MarkdownSnippets
 {
@@ -8,22 +9,22 @@ namespace MarkdownSnippets
     /// </summary>
     public static class SimpleSnippetMarkdownHandling
     {
-        public static void AppendGroup(string key, IEnumerable<Snippet> snippets, Action<string> appendLine)
+        public static async Task AppendGroup(string key, IEnumerable<Snippet> snippets, Func<string, Task> appendLine)
         {
             Guard.AgainstNull(snippets, nameof(snippets));
             Guard.AgainstNull(appendLine, nameof(appendLine));
 
             foreach (var snippet in snippets)
             {
-                WriteSnippet(appendLine, snippet);
+                await WriteSnippet(appendLine, snippet);
             }
         }
 
-        static void WriteSnippet(Action<string> appendLine, Snippet snippet)
+        static async Task WriteSnippet(Func<string, Task> appendLine, Snippet snippet)
         {
-            appendLine($@"```{snippet.Language}");
-            appendLine(snippet.Value);
-            appendLine(@"```");
+            await appendLine($@"```{snippet.Language}");
+            await   appendLine(snippet.Value);
+            await   appendLine(@"```");
         }
     }
 }

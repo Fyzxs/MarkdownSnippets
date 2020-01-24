@@ -141,10 +141,11 @@ namespace MarkdownSnippets
                 {
                     builder.Clear();
 
-                    void AppendLine(string s)
+                    Task AppendLine(string s)
                     {
                         builder.Append(s);
                         builder.Append(newLine);
+                        return Task.CompletedTask;
                     }
 
                     await ProcessSnippetLine(AppendLine, missingSnippets, usedSnippets, key, line);
@@ -170,21 +171,21 @@ namespace MarkdownSnippets
                 missingIncludes: missingIncludes);
         }
 
-        async Task ProcessSnippetLine(Action<string> appendLine, List<MissingSnippet> missings, List<Snippet> used, string key, Line line)
+        async Task ProcessSnippetLine(Func<string, Task> appendLine, List<MissingSnippet> missings, List<Snippet> used, string key, Line line)
         {
-            appendLine($"<!-- snippet: {key} -->");
+           await appendLine($"<!-- snippet: {key} -->");
             var snippetsForKey = await TryGetSnippets(key);
             if (snippetsForKey.Any())
             {
-                appendSnippetGroup(key, snippetsForKey, appendLine);
-                appendLine("<!-- endsnippet -->");
+                await appendSnippetGroup(key, snippetsForKey, appendLine);
+                await    appendLine("<!-- endsnippet -->");
                 used.AddRange(snippetsForKey);
                 return;
             }
 
             var missing = new MissingSnippet(key, line.LineNumber, line.Path);
             missings.Add(missing);
-            appendLine($"** Could not find snippet '{key}' **");
+            await   appendLine($"** Could not find snippet '{key}' **");
         }
 
         async Task<IReadOnlyList<Snippet>> TryGetSnippets(string key)

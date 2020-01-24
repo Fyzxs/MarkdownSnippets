@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace MarkdownSnippets
 {
@@ -23,7 +24,7 @@ namespace MarkdownSnippets
             this.rootDirectory = rootDirectory.Replace(@"\", "/");
         }
 
-        public void AppendGroup(string key, IEnumerable<Snippet> snippets, Action<string> appendLine)
+        public async Task AppendGroup(string key, IEnumerable<Snippet> snippets, Func<string, Task> appendLine)
         {
             Guard.AgainstNullAndEmpty(key, nameof(key));
             Guard.AgainstNull(snippets, nameof(snippets));
@@ -31,21 +32,21 @@ namespace MarkdownSnippets
             uint index = 0;
             foreach (var snippet in snippets)
             {
-                WriteSnippet(appendLine, snippet, index);
+                await WriteSnippet(appendLine, snippet, index);
                 index++;
             }
         }
 
-        void WriteSnippet(Action<string> appendLine, Snippet snippet, uint index)
+        async Task WriteSnippet(Func<string, Task> appendLine, Snippet snippet, uint index)
         {
             var anchor = GetAnchorText(snippet, index);
 
-            appendLine($"<a id='{anchor}'/></a>");
-            WriteSnippetValueAndLanguage(appendLine, snippet);
+            await appendLine($"<a id='{anchor}'/></a>");
+            await WriteSnippetValueAndLanguage(appendLine, snippet);
 
             if (TryGetSupText(snippet,anchor, out var supText))
             {
-                appendLine($"<sup>{supText}</sup>");
+                await appendLine($"<sup>{supText}</sup>");
             }
         }
 
@@ -91,11 +92,11 @@ namespace MarkdownSnippets
             return true;
         }
 
-        static void WriteSnippetValueAndLanguage(Action<string> appendLine, Snippet snippet)
+        static async Task WriteSnippetValueAndLanguage(Func<string, Task> appendLine, Snippet snippet)
         {
-            appendLine($"```{snippet.Language}");
-            appendLine(snippet.Value);
-            appendLine("```");
+            await appendLine($"```{snippet.Language}");
+            await appendLine(snippet.Value);
+            await appendLine("```");
         }
 
         string BuildLink(Snippet snippet, string path)

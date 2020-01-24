@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace MarkdownSnippets
 {
-    public delegate void AppendSnippetGroupToMarkdown(string key, IEnumerable<Snippet> snippets, Action<string> appendLine);
+    public delegate Task AppendSnippetGroupToMarkdown(string key, IEnumerable<Snippet> snippets, Func<string, Task> appendLine);
 }

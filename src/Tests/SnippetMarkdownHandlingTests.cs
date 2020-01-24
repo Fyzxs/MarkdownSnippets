@@ -11,17 +11,17 @@ public class SnippetMarkdownHandlingTests :
     VerifyBase
 {
     [Fact]
-    public Task AppendGroup()
+    public async Task AppendGroup()
     {
         var builder = new StringBuilder();
         var snippets = new List<Snippet> {Snippet.Build(1, 2, "theValue", "thekey", "thelanguage", "c:/dir/thePath")};
         var markdownHandling = new SnippetMarkdownHandling("c:/dir/", LinkFormat.GitHub);
-        using (var writer = new StringWriter(builder))
+        await using (var writer = new StringWriter(builder))
         {
-            markdownHandling.AppendGroup("key1", snippets, writer.WriteLine);
+            await markdownHandling.AppendGroup("key1", snippets, writer.WriteLineAsync);
         }
 
-        return Verify(builder.ToString());
+        await Verify(builder.ToString());
     }
 
     public SnippetMarkdownHandlingTests(ITestOutputHelper output) :
