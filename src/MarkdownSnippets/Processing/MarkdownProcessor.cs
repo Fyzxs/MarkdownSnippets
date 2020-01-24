@@ -173,8 +173,8 @@ namespace MarkdownSnippets
         void ProcessSnippetLine(Action<string> appendLine, List<MissingSnippet> missings, List<Snippet> used, string key, Line line)
         {
             appendLine($"<!-- snippet: {key} -->");
-
-            if (TryGetSnippets(key, out var snippetsForKey))
+            var snippetsForKey = TryGetSnippets(key).ToList();
+            if (snippetsForKey.Any())
             {
                 appendSnippetGroup(key, snippetsForKey, appendLine);
                 appendLine("<!-- endsnippet -->");
@@ -187,11 +187,11 @@ namespace MarkdownSnippets
             appendLine($"** Could not find snippet '{key}' **");
         }
 
-        bool TryGetSnippets(string key, out IReadOnlyList<Snippet> snippetsForKey)
+        IEnumerable<Snippet> TryGetSnippets(string key)
         {
-            if (snippets.TryGetValue(key, out snippetsForKey))
+            if (snippets.TryGetValue(key, out var snippetsForKey))
             {
-                return true;
+                return snippetsForKey;
             }
 
             if (key.StartsWith("http"))
@@ -199,18 +199,16 @@ namespace MarkdownSnippets
                 var (success, path) = Downloader.DownloadFile(key).GetAwaiter().GetResult();
                 if (!success)
                 {
-                    return false;
+                    return Enumerable.Empty<Snippet>();
                 }
 
-                snippetsForKey = new List<Snippet>
+                return new List<Snippet>
                 {
                     FileToSnippet(key, path!, null)
                 };
-                return true;
             }
 
-            snippetsForKey = FilesToSnippets(key);
-            return snippetsForKey.Any();
+            return FilesToSnippets(key);
         }
 
         List<Snippet> FilesToSnippets(string key)
