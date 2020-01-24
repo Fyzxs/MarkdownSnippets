@@ -197,7 +197,7 @@ namespace MarkdownSnippets
 
             if (key.StartsWith("http"))
             {
-                var (success, path) = Downloader.DownloadFile(key).GetAwaiter().GetResult();
+                var (success, path) = await Downloader.DownloadFile(key);
                 if (!success)
                 {
                     return Array.Empty<Snippet>();
