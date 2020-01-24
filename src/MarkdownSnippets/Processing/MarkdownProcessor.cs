@@ -97,7 +97,7 @@ namespace MarkdownSnippets
             var result = await Apply(lines, newLine, file);
             foreach (var line in lines)
             {
-                writer.WriteLine(line.Current);
+                await writer.WriteLineAsync(line.Current);
             }
 
             return result;
