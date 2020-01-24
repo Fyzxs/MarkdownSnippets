@@ -55,8 +55,8 @@ public class SnippetExtractorTests :
   AfterWhiteSpace
 
   #endregion";
-        var snippets =await  FromText(input);
-        await  Verify(snippets);
+        var snippets = await FromText(input);
+        await Verify(snippets);
     }
 
     [Fact]
@@ -70,7 +70,7 @@ public class SnippetExtractorTests :
   c
   #endregion";
         var snippets = await FromText(input);
-        await  Verify(snippets);
+        await Verify(snippets);
     }
 
     [Fact]
@@ -85,7 +85,7 @@ public class SnippetExtractorTests :
   c
   #endregion";
         var snippets = await FromText(input);
-        await  Verify(snippets);
+        await Verify(snippets);
     }
 
     [Fact]
@@ -99,8 +99,8 @@ public class SnippetExtractorTests :
   <!-- end-snippet -->
   c
   #endregion";
-        var snippets =await  FromText(input);
-        await  Verify(snippets);
+        var snippets = await FromText(input);
+        await Verify(snippets);
     }
 
     [Fact]
@@ -132,7 +132,7 @@ public class SnippetExtractorTests :
 
 ";
         var snippets = await FromText(input);
-        await  Verify(snippets);
+        await Verify(snippets);
     }
 
     [Fact]
@@ -147,7 +147,7 @@ public class SnippetExtractorTests :
   c
   <!-- end-snippet -->";
         var snippets = await FromText(input);
-        await  Verify(snippets);
+        await Verify(snippets);
     }
 
     [Fact]
@@ -161,8 +161,8 @@ public class SnippetExtractorTests :
   #endregion
   c
   <!-- end-snippet -->";
-        var snippets =await  FromText(input);
-        await  Verify(snippets);
+        var snippets = await FromText(input);
+        await Verify(snippets);
     }
 
     [Fact]
@@ -173,7 +173,7 @@ public class SnippetExtractorTests :
   <configSections/>
   <!-- end-snippet -->";
         var snippets = await FromText(input);
-        await  Verify(snippets);
+        await Verify(snippets);
     }
 
     ValueTask<List<Snippet>> FromText(string contents)
@@ -189,7 +189,7 @@ public class SnippetExtractorTests :
   <!-- begin-snippet: CodeKey -->
   <configSections/>";
         var snippets = await FromText(input);
-        await  Verify(snippets);
+        await Verify(snippets);
     }
 
     [Fact]
@@ -199,7 +199,7 @@ public class SnippetExtractorTests :
   #region CodeKey
   <configSections/>";
         var snippets = await FromText(input);
-        await  Verify(snippets);
+        await Verify(snippets);
     }
 
     [Fact]
@@ -210,7 +210,7 @@ public class SnippetExtractorTests :
   caaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab
   #endregion";
         var snippets = await FromText(input);
-        await  Verify(snippets);
+        await Verify(snippets);
     }
 
     [Fact]
@@ -221,7 +221,7 @@ public class SnippetExtractorTests :
   The Code
   #endregion";
         var snippets = await FromText(input);
-        await  Verify(snippets);
+        await Verify(snippets);
     }
 
     [Fact]
@@ -232,7 +232,7 @@ public class SnippetExtractorTests :
   the code
   // end-snippet ";
         var snippets = await FromText(input);
-        await  Verify(snippets);
+        await Verify(snippets);
     }
 
     [Fact]
@@ -243,7 +243,7 @@ public class SnippetExtractorTests :
   <configSections/>
   <!--end-snippet-->";
         var snippets = await FromText(input);
-        await  Verify(snippets);
+        await Verify(snippets);
     }
 
     [Fact]
@@ -254,7 +254,7 @@ public class SnippetExtractorTests :
   the code
   // end-snippet   ";
         var snippets = await FromText(input);
-        await  Verify(snippets);
+        await Verify(snippets);
     }
 
     public SnippetExtractorTests(ITestOutputHelper output) :
