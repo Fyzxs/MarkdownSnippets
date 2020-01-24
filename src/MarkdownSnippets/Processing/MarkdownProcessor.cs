@@ -87,14 +87,14 @@ namespace MarkdownSnippets
         /// <summary>
         /// Apply to <paramref name="writer"/>.
         /// </summary>
-        public Task<ProcessResult> Apply(TextReader textReader, TextWriter writer, string? file = null)
+        public async Task<ProcessResult> Apply(TextReader textReader, TextWriter writer, string? file = null)
         {
             Guard.AgainstNull(textReader, nameof(textReader));
             Guard.AgainstNull(writer, nameof(writer));
             Guard.AgainstEmpty(file, nameof(file));
             var (lines, newLine) = LineReader.ReadAllLines(textReader, null);
             writer.NewLine = newLine;
-            var result = Apply(lines, newLine, file);
+            var result = await Apply(lines, newLine, file);
             foreach (var line in lines)
             {
                 writer.WriteLine(line.Current);
@@ -147,7 +147,7 @@ namespace MarkdownSnippets
                         builder.Append(newLine);
                     }
 
-                    ProcessSnippetLine(AppendLine, missingSnippets, usedSnippets, key, line);
+                    await ProcessSnippetLine(AppendLine, missingSnippets, usedSnippets, key, line);
                     builder.TrimEnd();
                     line.Current = builder.ToString();
                 }
@@ -170,10 +170,10 @@ namespace MarkdownSnippets
                 missingIncludes: missingIncludes);
         }
 
-        void ProcessSnippetLine(Action<string> appendLine, List<MissingSnippet> missings, List<Snippet> used, string key, Line line)
+        async Task ProcessSnippetLine(Action<string> appendLine, List<MissingSnippet> missings, List<Snippet> used, string key, Line line)
         {
             appendLine($"<!-- snippet: {key} -->");
-            var snippetsForKey = TryGetSnippets(key).ToList();
+            var snippetsForKey = await TryGetSnippets(key);
             if (snippetsForKey.Any())
             {
                 appendSnippetGroup(key, snippetsForKey, appendLine);
@@ -187,7 +187,7 @@ namespace MarkdownSnippets
             appendLine($"** Could not find snippet '{key}' **");
         }
 
-        IEnumerable<Snippet> TryGetSnippets(string key)
+        async Task<IReadOnlyList<Snippet>> TryGetSnippets(string key)
         {
             if (snippets.TryGetValue(key, out var snippetsForKey))
             {
@@ -199,19 +199,19 @@ namespace MarkdownSnippets
                 var (success, path) = Downloader.DownloadFile(key).GetAwaiter().GetResult();
                 if (!success)
                 {
-                    return Enumerable.Empty<Snippet>();
+                    return Array.Empty<Snippet>();
                 }
 
                 return new List<Snippet>
                 {
-                    FileToSnippet(key, path!, null)
+                    await FileToSnippet(key, path!, null)
                 };
             }
 
-            return FilesToSnippets(key);
+            return await FilesToSnippets(key);
         }
 
-        List<Snippet> FilesToSnippets(string key)
+        Task<Snippet[]> FilesToSnippets(string key)
         {
             string keyWithDirChar;
             if (key.StartsWith("/"))
@@ -223,15 +223,15 @@ namespace MarkdownSnippets
                 keyWithDirChar = "/" + key;
             }
 
-            return snippetSourceFiles
+            var tasks = snippetSourceFiles
                 .Where(file => file.EndsWith(keyWithDirChar, StringComparison.OrdinalIgnoreCase))
-                .Select(file => FileToSnippet(key, file, file))
-                .ToList();
+                .Select(file => FileToSnippet(key, file, file));
+            return Task.WhenAll(tasks);
         }
 
-        static Snippet FileToSnippet(string key, string file, string? path)
+        static async Task<Snippet> FileToSnippet(string key, string file, string? path)
         {
-            var (text, lineCount) = ReadNonStartEndLines(file);
+            var (text, lineCount) = await ReadNonStartEndLines(file);
 
             if (lineCount == 0)
             {
@@ -247,9 +247,9 @@ namespace MarkdownSnippets
                 path: path);
         }
 
-        static (string text, int lineCount) ReadNonStartEndLines(string file)
+        static async Task<(string text, int lineCount)> ReadNonStartEndLines(string file)
         {
-            var cleanedLines = File.ReadAllLines(file)
+            var cleanedLines = (await FileEx.ReadAllLinesAsync(file))
                 .Where(x => !StartEndTester.IsStartOrEnd(x.TrimStart())).ToList();
             return (string.Join(Environment.NewLine, cleanedLines), cleanedLines.Count);
         }
